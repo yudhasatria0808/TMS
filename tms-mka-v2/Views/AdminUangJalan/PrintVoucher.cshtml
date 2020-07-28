@@ -1,0 +1,334 @@
+﻿@using tms_mka_v2.Models;
+<link rel="stylesheet" href="~/Content/metronic/bootstrap.min.css" />
+<SCRIPT>
+    function update(numString){
+        var bigNumArry = new Array('', ' RIBU', ' JUTA', ' MILYAR', ' TRILIUN', ' QUADRALIUN', ' QUINTIILIUN');
+
+        var output = '';
+        var finlOutPut = new Array();
+
+        if (numString == '0') {
+            console.log('Zero');
+            return;
+        }
+
+        if (numString == 0) {
+            console.log('messeg tell to enter numbers');
+            return;
+        }
+
+        var i = numString.length;
+        i = i - 1;
+
+        //cut the number to grups of three digits and add them to the Arry
+        while (numString.length > 3) {
+            var triDig = new Array(3);
+            triDig[2] = numString.charAt(numString.length - 1);
+            triDig[1] = numString.charAt(numString.length - 2);
+            triDig[0] = numString.charAt(numString.length - 3);
+
+            var varToAdd = triDig[0] + triDig[1] + triDig[2];
+            finlOutPut.push(varToAdd);
+            i--;
+            numString = numString.substring(0, numString.length - 3);
+        }
+        finlOutPut.push(numString);
+        finlOutPut.reverse();
+
+        //conver each grup of three digits to english word
+        //if all digits are zero the triConvert
+        //function return the string "dontAddBigSufix"
+        for (j = 0; j < finlOutPut.length; j++) {
+            finlOutPut[j] = triConvert(parseInt(finlOutPut[j]));
+        }
+
+        var bigScalCntr = 0; //this int mark the million billion trillion... Arry
+
+        for (b = finlOutPut.length - 1; b >= 0; b--) {
+            if (finlOutPut[b] != "dontAddBigSufix") {
+                finlOutPut[b] = finlOutPut[b] + bigNumArry[bigScalCntr] + ' RP';
+                bigScalCntr++;
+            }
+            else {
+                //replace the string at finlOP[b] from "dontAddBigSufix" to empty String.
+                finlOutPut[b] = ' ';
+                bigScalCntr++; //advance the counter  
+            }
+        }
+
+            //convert The output Arry to , more printable string 
+            for(n = 0; n<finlOutPut.length; n++){
+                output +=finlOutPut[n];
+            }
+        return output.replace('SE ', 'SE');//print the output
+    }
+
+    //simple function to convert from numbers to words from 1 to 999
+    function triConvert(num){
+        var ones = new Array('', ' SE', ' DUA', ' TIGA', ' EMPAT', ' LIMA', ' ENAM', ' TUJUH', ' DELAPAN', ' SEMBILAN', ' SEPULUH', ' SEBELAS', ' DUA BELAS', ' TIGA BELAS', ' EMPAT BELAS', ' LIMA BELAS', ' ENAM BELAS', ' TUJUH BELAS', ' DELAPAN BELAS', ' SEMBILAN BELAS');
+        var tens = new Array('', '', ' DUA PULUH', ' TIGA PULUH', ' EMPAT PULUH', ' LIMA PULUH', ' ENAM PULUH', ' TUJUH PULUH', ' DELAPAN PULUH', ' SEMBILAN PULUH');
+        var hundred = ' RATUS';
+        var output = '';
+        var numString = num.toString();
+
+        if (num == 0) {
+            return 'dontAddBigSufix';
+        }
+        //the case of 10, 11, 12 ,13, .... 19 
+        if (num < 20) {
+            output = ones[num];
+            return output;
+        }
+
+        //100 and more
+        if (numString.length == 3) {
+            output = ones[parseInt(numString.charAt(0))] + hundred;
+            output += tens[parseInt(numString.charAt(1))];
+            output += ones[parseInt(numString.charAt(2))];
+            return output;
+        }
+
+        output += tens[parseInt(numString.charAt(0))];
+        output += ones[parseInt(numString.charAt(1))];
+
+        return output;
+    }
+</script>
+<body>
+    <div class="container">
+        @foreach (var item in Model.ModelListSpbu)
+        {
+            <div class="col-xs-6 col-md-6">
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6"> <text>@item.NamaSpbu</text></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6"> <text>@ViewBag.TanggalMuat</text></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6"> <text>@ViewBag.VehicleNo</text></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6"> <text>@ViewBag.Jenis</text></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6"> <text> @ViewBag.Liter</text> L</label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6"> <text> @string.Format("{0:n0}", item.Value)</text></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6" id="@item.Value">
+                        <script>document.getElementById(@item.Value).innerHTML = update("@item.Value")</script>
+                    </label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+            </div>
+        }
+        @foreach (var item in Model.ModelListKapal)
+        {
+            <div class="col-xs-6 col-md-6">
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6"> <text>@item.NamaPenyebrangan</text></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6"> <text>@ViewBag.TanggalMuat</text></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6"> <text>@ViewBag.VehicleNo</text></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6"> <text>@ViewBag.Jenis</text></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6"> <text> Ganti Sianturi</label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6" id="bahanterbilang"> <text> @string.Format("{0:n0}", item.Value)</text></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6" id="@item.Value">
+                        <script>document.getElementById(@item.Value).innerHTML = update("@item.Value")</script>
+                    </label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+                <div class="row">
+                    <label class="col-xs-6 col-md-6"></label>
+                </div>
+            </div>
+        }
+    </div>
+</body>

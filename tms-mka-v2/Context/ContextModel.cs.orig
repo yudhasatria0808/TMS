@@ -1,0 +1,54 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Data.Entity;
+using System.Data.Entity.ModelConfiguration.Conventions;
+
+namespace tms_mka_v2.Context
+{
+    public class ContextModel : DbContext
+    {
+        public ContextModel()
+            : base("tmsDefault")
+        {
+
+        }
+
+        public DbSet<LookupCode> LookupCode { get; set; }
+        public DbSet<LookupCodeCategories> LookupCodeCategories { get; set; }
+        public DbSet<MasterProduct> MasterProduct { get; set; }
+        public DbSet<JenisTrucks> JenisTrucks { get; set; }
+        public DbSet<JnsTols> JnsTols { get; set; }
+        public DbSet<User> User { get; set; }
+        public DbSet<UserReference> UserReference { get; set; }
+        public DbSet<UserRoles> UserRoles { get; set; }
+        public DbSet<Role> Role { get; set; }
+        public DbSet<Customer> Customer { get; set; }
+        public DbSet<Location> Location { get; set; }
+        public DbSet<Rekenings> Rekenings { get; set; }
+        public DbSet<Multidrop> Multidrop { get; set; }
+        public DbSet<MasterArea> MasterArea { get; set; }
+        public DbSet<Rute> Rute { get; set; }
+        public DbSet<MasterPool> MasterPool { get; set; }
+        public DbSet<Atm> Atm { get; set; }
+        public DbSet<Mekanik> Mekanik { get; set; }
+        public DbSet<VendorGps> VendorGps { get; set; }
+        public DbSet<DataTruck> DataTruck { get; set; }
+        public DbSet<DataBox> DataBox { get; set; }
+        public DbSet<RuteTol> RuteTol { get; set; }
+        public DbSet<Driver> Driver { get; set; }
+        public DbSet<MasterSolar> MasterSolar { get; set; }
+<<<<<<< HEAD
+        public DbSet<DataGPS> DataGPS { get; set; }
+        public DbSet<FaktorBorongan> FaktorBorongan { get; set; }
+        public DbSet<DataBorongan> DataBorongan { get; set; }
+=======
+        public DbSet<Pendingin> Pendingin { get; set; }
+>>>>>>> b793ec7852ecf8cad3c945adb2c5532469b6367c
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+        }
+    }
+}

@@ -1,0 +1,132 @@
+﻿@using tms_mka_v2.Models;
+@model tms_mka_v2.Models.DokumenIndex
+<link rel="stylesheet" href="~/Content/metronic/bootstrap.min.css" />
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-6 col-md-6">
+                <div class="row">
+                    <label class="control-label col-xs-3 col-md-3">Vehicle No</label>
+                    <label class="control-label col-xs-9 col-md-9">: @Model.VehicleNo  |  @Model.JnsTruck</label>
+                </div>
+                <div class="row">
+                    <label class="control-label col-xs-3 col-md-3">No SO</label>
+                    <label class="control-label col-xs-9 col-md-9">: @Model.NoSo</label>
+                </div>
+                <div class="row">
+                    <label class="control-label col-xs-3 col-md-3">Kode Nama</label>
+                    <label class="control-label col-xs-9 col-md-9">: @Model.KodeNama</label>
+                </div>
+                <div class="row">
+                    <label class="control-label col-xs-3 col-md-3">Customer</label>
+                    <label class="control-label col-xs-9 col-md-9">: @Model.Customer</label>
+                </div>
+            </div>
+            <div class="col-xs-6 col-md-6">
+                <div class="row">
+                    <label class="control-label col-xs-4 col-md-4">Nama Driver</label>
+                    <label class="control-label col-xs-8 col-md-8">: @Model.NamaDriver</label>
+                </div>
+                <div class="row">
+                    <label class="control-label col-xs-4 col-md-4">Tanggal Jalan</label>
+                    <label class="control-label col-xs-8 col-md-8">: @Model.TanggalMuat</label>
+                </div>
+                <div class="row">
+                    <label class="control-label col-xs-4 col-md-4">Rute</label>
+                    <label class="control-label col-xs-8 col-md-8">: @Model.Rute</label>
+                </div>
+                <div class="row">
+                    <label class="control-label col-xs-4 col-md-4">Tanggal Pulang</label>
+                    <label class="control-label col-xs-8 col-md-8">: @ViewBag.TanggalPulang</label>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <td>No</td>
+                        <td>Nama Dokumen</td>
+                        <td>Jumlah</td>
+                        <td>Warna</td>
+                        <td>Stempel & TTD</td>
+                        <td>Keterangan</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.ListDokumen.Count; i++)
+                    {
+                        <tr>
+                            <td>@(i + 1)</td>
+                            <td>@Model.ListDokumen[i].Nama</td>
+                            <td>@Model.ListDokumen[i].Jml</td>
+                            <td>@Model.ListDokumen[i].Warna</td>
+                            <td>
+                                @if (Model.ListDokumen[i].Stempel == true){
+                                    <text>WAJIB</text>
+                                }
+                                else{
+                                    <text>WAJIB</text>
+                                }
+                            </td>
+                            <td>@Model.ListDokumen[i].KeteranganAdmin</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-xs-1 col-md-4">
+                Berita Acara Klaim
+            </div>
+            <div class="col-xs-1 col-md-4">
+                <div class="input-group input-group-sm">
+                    <input class="form-control" type="text" value="&nbsp;&nbsp;&nbsp;" style="border: 1px solid black !important">
+                    <span class="input-group-btn">
+                           Ada
+                    </span>
+                </div>
+            </div>
+            <div class="col-xs-1 col-md-4">
+                <div class="input-group input-group-sm">
+                    <input class="form-control" type="text" value="&nbsp;&nbsp;&nbsp;" style="border: 1px solid black !important">
+                    <span class="input-group-btn">
+                           Tidak
+                    </span>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-xs-4 col-md-4">
+                Driver
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                (&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)
+            </div>
+            <div class="col-xs-4 col-md-4">
+                Tanggal_____ <br />
+                Admin SJ
+                <br />
+                <br />
+                <br />
+                <br />
+                (&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)
+            </div>
+            <div class="col-xs-4 col-md-4">
+                Tanggal_____ <br />
+                Admin Billing
+                <br />
+                <br />
+                <br />
+                <br />
+                (&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)
+            </div>
+        </div>
+    </div>
+</body>

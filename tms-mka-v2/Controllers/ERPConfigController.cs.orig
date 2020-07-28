@@ -1,0 +1,164 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Security;
+using System.Security;
+using Newtonsoft.Json;
+using tms_mka_v2.Business_Logic.Abstract;
+using tms_mka_v2.Models;
+using tms_mka_v2.Security;
+using tms_mka_v2.Infrastructure;
+using System.Web.Script.Serialization;
+using System.Security.Cryptography;
+using System.IO;
+using System.Text;
+using OfficeOpenXml;
+
+namespace tms_mka_v2.Controllers
+{
+    public class ERPConfigController : BaseController
+    {
+        private ISalesOrderRepo RepoSalesOrder;
+        private IERPConfigRepo RepoERPConfig;
+        private ISettlementBatalRepo RepoSettBatal;
+        private IBatalOrderRepo RepoBatalOrder;
+        private Iac_mstrRepo Repoac_mstr;
+        public ERPConfigController(IUserReferenceRepo repoBase, ILookupCodeRepo repoLookup, ISalesOrderRepo repoSalesOrder, IERPConfigRepo repoERPConfig, ISettlementBatalRepo repoSettBatal, IBatalOrderRepo repoBatalOrder, Iac_mstrRepo repoac_mstr)
+            : base(repoBase, repoLookup)
+        {
+            RepoSalesOrder = repoSalesOrder;
+            RepoSettBatal = repoSettBatal;
+            RepoBatalOrder = repoBatalOrder;
+            RepoERPConfig = repoERPConfig;
+            Repoac_mstr = repoac_mstr;
+        }
+        public ActionResult Edit(int idSo)
+        {
+            Context.ERPConfig dbitem = RepoERPConfig.FindByPK(idSo);
+
+            return View("Form", dbitem);
+        }
+        [HttpPost]
+        public ActionResult Edit(ERPConfig model)
+        {
+            Context.SalesOrder dbso = RepoSalesOrder.FindByPK(model.IdSalesOrder.Value);
+            Context.ERPConfig revisiTgl = new Context.ERPConfig();
+
+            if (ModelState.IsValid)
+            {
+                if (dbso.Status == "dispatched")
+                {
+                    //batalkeun so na
+                    Context.SettlementBatal dbsettlement = new Context.SettlementBatal();
+                    Context.AdminUangJalan dummyAdminUangJalan = dbso.AdminUangJalan;
+                    Context.BatalOrder batalOrder = new Context.BatalOrder();
+                    //batal
+                    dbso.Status = "batal order";
+                    batalOrder.IdSalesOrder = dbso.Id;
+                    batalOrder.Keterangan = "Revisi JenisTruk";
+                    batalOrder.ModifiedDate = DateTime.Now;
+                    RepoSalesOrder.save(dbso);
+                    RepoBatalOrder.save(batalOrder);
+                    //settlement batal
+                    dbsettlement.IdSalesOrder = dbso.Id;
+                    if (dummyAdminUangJalan.AdminUangJalanUangTf.Any(d => d.Keterangan == "Tunai"))
+                    {
+                        dbsettlement.KasDiterima = dummyAdminUangJalan.AdminUangJalanUangTf.Where(d => d.Keterangan == "Tunai").FirstOrDefault().JumlahTransfer;
+                    }
+                    if (dummyAdminUangJalan.AdminUangJalanUangTf.Any(d => d.Keterangan.Contains("Transfer")))
+                    {
+                        dbsettlement.TransferDiterima = dummyAdminUangJalan.AdminUangJalanUangTf.Where(d => d.Keterangan.Contains("Transfer")).Sum(t => t.JumlahTransfer);
+                    }
+                    dbsettlement.SolarDiterima = dummyAdminUangJalan.AdminUangJalanVoucherSpbu.Sum(s => s.Value);
+                    dbsettlement.KapalDiterima = dummyAdminUangJalan.AdminUangJalanVoucherKapal.Sum(s => s.Value);
+                    dbsettlement.JenisBatal = "Batal Order";
+                    dbsettlement.IdDriver = dbso.SalesOrderOncallId.HasValue ? dbso.SalesOrderOncall.Driver1Id : dbso.SalesOrderProsesKonsolidasiId.HasValue ? dbso.SalesOrderProsesKonsolidasi.Driver1Id : dbso.SalesOrderPickup.Driver1Id;
+                    RepoSettBatal.save(dbsettlement);
+                    //create so baru
+                    Context.SalesOrder dummySo = new Context.SalesOrder();
+                    dummySo.isReturn = true;
+                    dummySo.Status = "Draft";
+                    dummySo.AdminUangJalanId = null;
+                    dummySo.AdminUangJalan = null;
+                    dummySo.DateStatus = DateTime.Now;
+
+                    if (dbso.SalesOrderOncallId.HasValue)
+                    {
+                        //urus anak na
+                        Context.SalesOrderOncall dboncall = new Context.SalesOrderOncall();
+                        SalesOrderOncall modelOncall = new SalesOrderOncall(dbso);
+                        modelOncall.setDb(dboncall);
+                        dboncall.SalesOrderOnCallId = 0;
+                        dboncall.JenisTruckId = model.JenisTruckIdBaru;
+                        dboncall.Urutan = RepoSalesOrder.getUrutanOnCAll(modelOncall.TanggalMuat.Value) + 1;
+                        dboncall.SONumber = RepoSalesOrder.generateCodeOnCall(modelOncall.TanggalMuat.Value, dboncall.Urutan);
+                        dboncall.DN = "DN" + dboncall.SONumber;
+
+                        dummySo.SalesOrderOncall = dboncall;
+                    }
+                    else if (dbso.SalesOrderProsesKonsolidasiId.HasValue)
+                    {
+                        Context.SalesOrderProsesKonsolidasi dbkonsolidasi = new Context.SalesOrderProsesKonsolidasi();
+                        SalesOrderProsesKonsolidasi modelKonsolidasi = new SalesOrderProsesKonsolidasi(dbso);
+                        modelKonsolidasi.setDb(dbkonsolidasi);
+                        dbkonsolidasi.SalesOrderProsesKonsolidasiId = 0;
+                        dbkonsolidasi.JenisTruckId = model.JenisTruckIdBaru;
+                        dbkonsolidasi.Urutan = RepoSalesOrder.getUrutanProsesKonsolidasi(modelKonsolidasi.TanggalMuat.Value) + 1;
+                        dbkonsolidasi.SONumber = RepoSalesOrder.generateProsesKonsolidasi(modelKonsolidasi.TanggalMuat.Value, dbkonsolidasi.Urutan);
+                        dbkonsolidasi.DN = "DN" + dbkonsolidasi.SONumber;
+                        dummySo.SalesOrderProsesKonsolidasi = dbkonsolidasi;
+                    }
+                    dummySo.Id = 0;
+                    RepoSalesOrder.save(dummySo);
+                }
+                else 
+                {
+                    if (dbso.SalesOrderOncallId.HasValue)
+                    {
+                        dbso.SalesOrderOncall.JenisTruckId = model.JenisTruckIdBaru;
+                    }
+                    else if (dbso.SalesOrderProsesKonsolidasiId.HasValue)
+                    {
+                        dbso.SalesOrderProsesKonsolidasi.JenisTruckId = model.JenisTruckIdBaru;
+                    }
+                    RepoSalesOrder.save(dbso);
+                }
+
+                return RedirectToAction("Index", "ListOrder");
+            }
+
+            return View("Form", model);
+        }
+
+        public ActionResult AdminUangJalan()
+        {
+            ViewBag.name = "ERP Config - Admin Uang Jalan";
+            Context.ERPConfig dbitem = RepoERPConfig.FindByPK(1);
+
+            ac_mstr ac_mstr_kawalan = Repoac_mstr.FindByPk(dbitem.Kawalan);
+            ViewBag.nama_kawalan = ac_mstr_kawalan.ac_name;
+
+            ac_mstr ac_mstr_timbangan = Repoac_mstr.FindByPk(dbitem.Timbangan);
+            ViewBag.nama_timbangan = ac_mstr_timbangan.ac_name;
+
+            ac_mstr ac_mstr_karantina = Repoac_mstr.FindByPk(dbitem.Karantina);
+            ViewBag.nama_karantina = ac_mstr_karantina.ac_name;
+
+            ac_mstr ac_mstr_spsi = Repoac_mstr.FindByPk(dbitem.SPSI);
+            ViewBag.nama_spsi = ac_mstr_spsi.ac_name;
+
+            ac_mstr ac_mstr_multidrop = Repoac_mstr.FindByPk(dbitem.Multidrop);
+            ViewBag.nama_multidrop = ac_mstr_multidrop.ac_name;
+
+<<<<<<< HEAD
+            ac_mstr ac_mstr_tambahan_rute_muat = Repoac_mstr.FindByPk(dbitem.TambahanRuteMuat);
+            ViewBag.nama_tambahan_rute_muat = ac_mstr_tambahan_rute_muat.ac_name;
+
+=======
+>>>>>>> 379059c61b5438b8a117be63478e92ad736f2435
+            return View("AdminUangJalan", dbitem);
+        }
+    }
+}

@@ -1,0 +1,211 @@
+﻿@using tms_mka_v2.Models
+@model tms_mka_v2.Models.SalesOrderKonsolidasi
+@{
+    string rute = ViewBag.rute;
+    string satuan = Model.PerhitunganDasar != "Manual" ? Model.PerhitunganDasar : Model.TypeKonsolidasi;
+    var harga = 0;
+    
+    if(Model.PerhitunganDasar == "Tonase")
+    {
+        harga = Model.Tonase.Value;
+    }
+    else if (Model.PerhitunganDasar == "Karton")
+    {
+        harga = Model.karton.Value;
+    }
+    else if (Model.PerhitunganDasar == "Pallet")
+    {
+        harga = Model.Pallet.Value;
+    }
+    else if (Model.PerhitunganDasar == "Container")
+    {
+        harga = Model.Container.Value;
+    }
+    else if (Model.PerhitunganDasar == "m3")
+    {
+        harga = Model.m3.Value;
+    }
+    else if (Model.PerhitunganDasar == "Manual")
+    {
+        if (Model.TypeKonsolidasi == "Tonase")
+        {
+            harga = Model.Tonase.Value;
+        }
+        else if (Model.TypeKonsolidasi == "Karton")
+        {
+            harga = Model.karton.Value;
+        }
+        else if (Model.TypeKonsolidasi == "Pallet")
+        {
+            harga = Model.Pallet.Value;
+        }
+        else if (Model.TypeKonsolidasi == "Container")
+        {
+            harga = Model.Container.Value;
+        }
+        else if (Model.TypeKonsolidasi == "m3")
+        {
+            harga = Model.m3.Value;
+        }
+    }
+    satuan = satuan == "Tonase" ? "Kg" : satuan;
+}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 col-md-12">
+            <div class="row">
+                <label class="col-xs-1 col-md-4"></label>
+                <img src="~/Content/img/logoMKA1.png" alt="logo" class="logo-default">
+            </div>
+            <div class="row">
+                <label class="col-xs-5 col-md-4"></label>
+                <label class="col-xs-4 col-md-4">BUKTI PENGIRIMAN</label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-6 col-md-6">
+            <div class="row">
+                <label class="col-xs-4 col-md-4"></label>
+                <label class="col-xs-4 col-md-4"></label>
+                <label class="col-xs-4 col-md-4"></label>
+            </div>
+        </div>
+        <div class="col-xs-6 col-md-6">
+            <div class="row">
+                <label class="col-xs-4 col-md-4"></label>
+                <label class="col-xs-8 col-md-8"></label>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6 col-md-6">
+        <div class="row">
+            <label class="col-xs-4 col-md-4"></label>
+            <label class="col-xs-8 col-md-8"> @Model.NamaCustomer</label>
+        </div>
+        <div class="row">
+            <label class="col-xs-4 col-md-4"></label>
+            <label class="col-xs-8 col-md-8"> @ViewBag.dari</label>
+        </div>
+        <div class="row">
+            <label class="col-xs-12 col-md-12"></label>
+            <label class="col-xs-12 col-md-12"> @harga @satuan</label>
+        </div>
+        <div class="row">
+            <label class="col-xs-4 col-md-4"></label>
+            <label class="col-xs-8 col-md-8"> @Model.StrProduct</label>
+        </div>
+        <div class="row">
+            <label class="col-xs-4 col-md-4"></label>
+            <label class="col-xs-8 col-md-8"> @ViewBag.tgl</label>
+        </div>
+        <div class="row">
+            <label class="col-xs-12 col-md-12"></label>
+        </div>
+    </div>
+    <div class="col-xs-6 col-md-6">
+        <div class="row">
+            <label class="col-xs-4 col-md-4"></label>
+            <label class="col-xs-8 col-md-8"> @ViewBag.namadr</label>
+        </div>
+        <div class="row">
+            <label class="col-xs-4 col-md-4"></label>
+            <label class="col-xs-5 col-md-4"></label>
+            <label class="col-xs-3 col-md-4"></label>
+        </div>
+        <div class="row">
+            <label class="col-xs-4 col-md-4"></label>
+            <label class="col-xs-5 col-md-4"></label>
+            <label class="col-xs-3 col-md-4"></label>
+        </div>
+        <div class="row">
+            <label class="col-xs-4 col-md-4"></label>
+            <label class="col-xs-8 col-md-8"> @ViewBag.nopol</label>
+        </div>
+        <div class="row">
+            <label class="col-xs-4 col-md-4"></label>
+            <label class="col-xs-5 col-md-5"></label>
+            <label class="col-xs-3 col-md-3"></label>
+        </div>
+        <div class="row">
+            <label class="col-xs-4 col-md-4"></label>
+            <label class="col-xs-5 col-md-5"></label>
+            <label class="col-xs-3 col-md-3"></label>
+        </div>
+        <div class="row">
+            <label class="col-xs-4 col-md-4"></label>
+            <label class="col-xs-8 col-md-8"> </label>
+        </div>
+        <div class="row">
+            <label class="col-xs-4 col-md-4"></label>
+            <label class="col-xs-1 col-md-8"> </label>
+            <label class="col-xs-1 col-md-8"></label>
+            <label class="col-xs-6 col-md-4"></label>
+        </div>
+        <div class="row">
+            <label class="col-xs-4 col-md-4"></label>
+            <label class="col-xs-1 col-md-8"> </label>
+        </div>
+    </div>
+    <div class="row">
+        <label class="col-xs-12 col-md-12"></label>
+    </div>
+    <div class="row">
+        <div class="col-xs-6 col-md-6">
+            <div class="row">
+                <label class="col-xs-4 col-md-4"></label>
+                <label class="col-xs-4 col-md-4"></label>
+                <label class="col-xs-4 col-md-4"></label>
+            </div>
+        </div>
+        <div class="col-xs-6 col-md-6">
+            <div class="row">
+                <label class="col-xs-4 col-md-4"></label>
+                <label class="col-xs-8 col-md-8"></label>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6 col-md-6">
+        <div class="row">
+            <label class="col-xs-4 col-md-4"></label>
+            <label class="col-xs-8 col-md-8"></label>
+        </div>
+        <div class="row">
+            <label class="col-xs-4 col-md-4"></label>
+            <label class="col-xs-8 col-md-8"> @ViewBag.tujuan</label>
+        </div>
+        <div class="row">
+            <label class="col-xs-4 col-md-3"></label>
+            <label class="col-xs-2 col-md-3"></label>
+            <label class="col-xs-4 col-md-3"></label>
+            <label class="col-xs-12 col-md-12"></label>
+        </div>
+        <div class="row">
+            <label class="col-xs-12 col-md-12"></label>
+            <label class="col-xs-12 col-md-12"><br /></label>
+        </div>
+    </div>
+    <div class="col-xs-6 col-md-6">
+        <div class="row">
+            <label class="col-xs-4 col-md-6"></label>
+            <label class="col-xs-8 col-md-6"> </label>
+        </div>
+        <div class="row">
+            <label class="col-xs-4 col-md-3"></label>
+            <label class="col-xs-2 col-md-3"></label>
+            <label class="col-xs-6 col-md-3"></label>
+            <label class="col-xs-12 col-md-12"></label>
+        </div>
+        <div class="row">
+            <label class="col-xs-12 col-md-12"></label>
+            <label class="col-xs-6 col-md-4"></label>
+            <label class="col-xs-6 col-md-4"></label>
+        </div>
+    </div>
+    <div class="row">
+        <label class="col-xs-12 col-md-12">/label>
+    </div>
+    <div class="row">
+        <label class="col-xs-12 col-md-12"></label>
+    </div>
+</div>
